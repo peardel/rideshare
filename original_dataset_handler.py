@@ -1,4 +1,4 @@
-import pandas
+import pandas as pd
 import os
 
 import pupil
@@ -6,7 +6,7 @@ import pupil
 def harvest_pupil_data_from_excel(filename:str="OriginalDataset.xlsx", verbose:bool=True) -> list[pupil.Pupil]:
     if verbose: print(f"Harvesting pupil data from {filename}")
     full_filename = os.path.join(os.path.dirname(__file__), filename)
-    data: pandas.DataFrame = pandas.read_excel(io=full_filename, header=0, names=None, index_col=None, usecols="A:N", true_values="YES", false_values="NO", nrows=101)
+    data: pd.DataFrame = pd.read_excel(io=full_filename, header=0, names=None, index_col=None, usecols="A:N", true_values="YES", false_values="NO", nrows=101)
 
     pupils = []
     for item in data.iterrows():
