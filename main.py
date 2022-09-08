@@ -6,6 +6,7 @@ from student import Pupil
 """
 
 THIS SHIT BELOW IS USELESS: DATABASE IS GIVEN TO USE VIA EXCEL FILE
+fuck you
 
 """
 
