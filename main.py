@@ -1,31 +1,14 @@
-import sqlite3
-
+import pandas
+import openrouteservice
 from student import Pupil
 
+df = pandas.read_excel("OriginalDataset.xlsx")
+print(df)
 
-"""
+def coords():g
 
-THIS SHIT BELOW IS USELESS: DATABASE IS GIVEN TO USE VIA EXCEL FILE
-fuck you
+SCHOOL = Pupil("GU1 3BB", False, False, 0)
+test_pupil = Pupil("KT13 8UW", False, False, 0)
 
-"""
-
-
-
-# values
-database_name = "students"
-
-def create_database():
-    connection = sqlite3.connect(f"{database_name}.db")
-    cursor = connection.cursor()
-
-    cursor.execute("CREATE TABLE Pupils(X,Y)")
-    connection.close()
-
-def insert_pupil(pupil):
-    connection = sqlite3.connect(f"{database_name}.db")
-    cursor = connection.cursor()
-
-    cursor.execute("""INSERT INTO Pupils VALUES
-    ()
-    """)
+client = openrouteservice.Client(key="5b3ce3597851110001cf6248b0c4037940f3452a988853816da080e9")
+routes = client.directions()
