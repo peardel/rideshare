@@ -3,7 +3,7 @@ import json
 import tools
 
 class Pupil:
-    def __init__(self, postcode: str, will_join_others: bool, will_share_others: bool, spare_seats: int):
+    def __init__(self, name: str, postcode: str, will_join_others: bool, will_share_others: bool, spare_seats: int):
         '''
         needs lat and long using apis and stuff
         '''

@@ -1,6 +1,6 @@
 import pandas
 import openrouteservice
-from student import Pupil
+from pupil import Pupil
 
 df = pandas.read_excel("OriginalDataset.xlsx")
 print(df)
