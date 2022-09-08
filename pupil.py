@@ -15,8 +15,8 @@ class Pupil:
 
         success = self.get_coordinates()
         if success is False:
-            print("failed")
-            pass # manage this when the original dataset is achieved
+            print(f"Failed for {self.name}")
+            self.failed = True
 
     def get_coordinates(self) -> bool:
         """

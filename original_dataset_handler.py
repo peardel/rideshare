@@ -19,5 +19,5 @@ def harvest_pupil_data_from_excel(filename: str="OriginalDataset.xlsx", verbose:
         new_pupil = pupil.Pupil(tools.get_random_name(), postcode, will_join_others, will_share_others, spare_seats)
         pupils.append(new_pupil)
     
-    print(f"Finished harvesting pupil data for {len(pupils)} pupils")
+    print(f"Finished harvesting pupil data for {len(pupils)} pupils, {len([p for p in pupils if not p.failed])}/{len(pupils)} succeeded")
     return pupils
