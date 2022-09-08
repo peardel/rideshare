@@ -19,7 +19,7 @@ class Pupil:
         r = requests.get(url)
 
         if r.status_code != 200:
-            raise Exception(f"HTTP error: status code {r.status_code}")
+            raise Exception(f"HTTP error while getting coordinates of postcode {self.postcode}: status code {r.status_code}")
         
         attributes = r.json()["data"]["attributes"]
         self.latitude: float = attributes["lat"]
