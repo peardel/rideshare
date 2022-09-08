@@ -5,10 +5,9 @@ from pupil import Pupil
 
 df = pandas.read_excel("OriginalDataset.xlsx")
 
-def coords(A: Pupil,B: Pupil):
-    return ((A.longitude,A.latitude),(B.longitude,B.latitude))
+coords = lambda A,B: ((A.longitude,A.latitude),(B.longitude,B.latitude))
 
-SCHOOL = Pupil("SCHOOL", "GU1 3JD", False, False, 0)
+SCHOOL = Pupil("SCHOOL", "GU1 3BB", False, False, 0)
 MAX_DISTANCE_TRAVELLABLE = 0.1
 client = openrouteservice.Client(key="5b3ce3597851110001cf6248b0c4037940f3452a988853816da080e9") # distance calcs should only be used to go to school, not to compare with other students
 

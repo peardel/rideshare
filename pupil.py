@@ -1,6 +1,9 @@
 import requests
 import json
 import tools
+import openrouteservice
+
+client = openrouteservice.Client(key="5b3ce3597851110001cf6248b0c4037940f3452a988853816da080e9")
 
 class Pupil:
     def __init__(self, name: str, postcode: str, will_join_others: bool, will_share_others: bool, spare_seats: int):
@@ -28,3 +31,26 @@ class Pupil:
 
     def get_distance(self, pupil: "Pupil") -> float:
         return tools.lat_lon_euclidean_dist(self.latitude, self.longitude, pupil.latitude, pupil.longitude)
+
+coords = lambda A,B: ((A.longitude,A.latitude),(B.longitude,B.latitude))
+
+def get_distance(pupil1: Pupil, pupil2: Pupil):
+    routes = client.directions(coords(pupil1, pupil2))
+    return routes["routes"][0]["summary"]["distance"]
+
+class Car:
+    def __init__(self,driver):
+        self.pupils = [driver]
+    
+    def get_distance(self):
+        distance = 0
+
+        for i,pupil in enumerate(self.pupils):
+            if i == len(self.pupils)-1:
+                target = Pupil("SCHOOL", "GU1 3BB", False, False, 0)
+            else:
+                target = self.pupils[i+1]
+            
+            distance += get_distance(pupil,target)
+
+        return distance
