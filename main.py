@@ -2,6 +2,15 @@ import sqlite3
 
 from student import Pupil
 
+
+"""
+
+THIS SHIT BELOW IS USELESS: DATABASE IS GIVEN TO USE VIA EXCEL FILE
+
+"""
+
+
+
 # values
 database_name = "students"
 
