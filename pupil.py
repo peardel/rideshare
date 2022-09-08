@@ -14,8 +14,7 @@ class Pupil:
 
         success = self.get_coordinates()
         if success is False:
-            print("failed")
-            pass # manage this when the original dataset is achieved
+            raise IndexError("Nonexistent postcode")
 
     def get_coordinates(self) -> bool:
         """
