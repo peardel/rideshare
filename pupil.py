@@ -14,9 +14,10 @@ class Pupil:
 
         success = self.get_coordinates()
         if success is False:
+            print("failed")
             pass # manage this when the original dataset is achieved
 
-    def get_coordinates(self):
+    def get_coordinates(self) -> bool:
         """
         do your free maps api thing
         """
@@ -35,5 +36,5 @@ class Pupil:
 
         return True
 
-    def get_distance(self, pupil):
+    def get_distance(self, pupil: "Pupil") -> float:
         return tools.lat_lon_euclidean_dist(self.latitude, self.longitude, pupil.latitude, pupil.longitude)
