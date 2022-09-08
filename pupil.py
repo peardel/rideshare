@@ -13,6 +13,7 @@ class Pupil:
         self.will_share_others: bool = will_share_others
         self.spare_seats: int = spare_seats
 
+        self.failed = False
         success = self.get_coordinates()
         if success is False:
             print(f"Failed for {self.name}")
