@@ -1,6 +1,6 @@
 import sqlite3
 
-from student import Pupil
+from pupil import Pupil
 
 
 """
