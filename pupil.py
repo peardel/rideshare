@@ -7,6 +7,7 @@ class Pupil:
         '''
         needs lat and long using apis and stuff
         '''
+        self.name: str = name
         self.postcode: str = postcode
         self.will_join_others: bool = will_join_others
         self.will_share_others: bool = will_share_others
