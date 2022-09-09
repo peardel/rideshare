@@ -19,11 +19,11 @@ def harvest_pupil_data_from_excel(filename: str="OriginalDataset.xlsx", verbose:
         # TODO: use the departure and arrival times
 
         try:
-            new_pupil = pupil.Pupil(tools.get_random_name(), postcode, will_join_others, will_share_others, spare_seats)
+            new_pupil = pupil.Pupil(idx, tools.get_random_name(), postcode, will_join_others, will_share_others, spare_seats)
             if will_share_others == "YES": pupils_willing_to_share.append(pupil)
             pupils.append(new_pupil)
         except IndexError:
-            print("failed")
+            print(f"Failed for pupil #{idx}")
     
     print(f"Finished harvesting pupil data for {len(pupils)} pupils, {len(pupils_willing_to_share)} willing to share")
     return pupils, pupils_willing_to_share
