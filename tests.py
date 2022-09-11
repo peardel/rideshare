@@ -1,6 +1,7 @@
 import pupil_classes
 import original_dataset_handler
 import pupil_group_calculator
+import asyncio
 
 
 def try_distance():
@@ -9,8 +10,8 @@ def try_distance():
 
     print(pupil1.get_distance(pupil2))
 
-def try_pupil_time_seperation():
-    pupils, pupils_willing_to_share = original_dataset_handler.harvest_pupil_data_from_excel(get_pos_with_api=True)
+async def try_pupil_time_seperation():
+    pupils, pupils_willing_to_share = await original_dataset_handler.harvest_pupil_data_from_excel(get_pos_with_api=True)
     times_dict = pupil_group_calculator.seperate_pupils_by_times(pupils, 0, pupil_group_calculator.ArrivalOrDeparture.DEPARTURE)
     groups_of_groups = []
     for time, pupils in times_dict.items():
@@ -20,4 +21,4 @@ def try_pupil_time_seperation():
         pupil_group_calculator.group_improvement_attempt_reorder(groups, True)
     
 
-try_pupil_time_seperation()
+asyncio.run(try_pupil_time_seperation())
