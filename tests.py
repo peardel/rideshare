@@ -18,7 +18,8 @@ async def try_pupil_time_seperation():
         groups = pupil_group_calculator.create_random_groups(pupils)
         groups_of_groups.append(groups)
     for groups in groups_of_groups:
-        pupil_group_calculator.group_improvement_attempt_reorder(groups, True)
+        groups, improved = pupil_group_calculator.group_improvement_attempt_reorder(groups, True)
+        groups, improved = pupil_group_calculator.group_improvement_attempt_remove_into_other_group(groups, True)
     
 
 asyncio.run(try_pupil_time_seperation())

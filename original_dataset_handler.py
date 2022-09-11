@@ -27,7 +27,7 @@ async def harvest_pupil_data_from_excel(filename: str="OriginalDataset.xlsx", ve
 
     for item in data.iterrows():
         coroutines.append(
-            get_pupil_from_item(item,get_pos_with_api)
+            get_pupil_from_item(item, get_pos_with_api)
         )
     
     preprocessed_pupils = await asyncio.gather(*coroutines)
