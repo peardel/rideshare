@@ -5,6 +5,7 @@ import openrouteservice
 
 client = openrouteservice.Client(key="5b3ce3597851110001cf6248b0c4037940f3452a988853816da080e9")
 
+SCHOOL_COORDINATES = (51.23738,-0.56944)
 class Pupil:
     def __init__(self, id: int, name: str, postcode: str, will_join_others: bool, will_share_others: bool, spare_seats: int, times: list[tuple[int, int]], get_pos_with_api: bool = True):
         '''
@@ -33,6 +34,7 @@ class Pupil:
             attributes = r.json()["data"]["attributes"]
             self.latitude: float = attributes["lat"]
             self.longitude: float = attributes["long"]
+            self.distance_to_school: float = tools.lat_lon_euclidean_dist(self.latitude, self.longitude, SCHOOL_COORDINATES[0], SCHOOL_COORDINATES[1])
 
     def get_distance_to_other_pupil(self, pupil: "Pupil") -> float:
         return tools.lat_lon_euclidean_dist(self.latitude, self.longitude, pupil.latitude, pupil.longitude)
