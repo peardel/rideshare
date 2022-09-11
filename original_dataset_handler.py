@@ -12,7 +12,7 @@ async def get_pupil_from_item(item, get_pos_with_api):
     times = [[tools.time_string_to_int(x) for x in [arrival, departure]] for arrival, departure in [[mon_arrival, mon_departure], [tue_arrival, tue_departure], [wed_arrival, wed_departure], [thu_arrival, thu_departure], [fri_arrival, fri_departure]]]
 
     try:
-        new_pupil = pupil_classes.Pupil(idx, tools.get_random_name(), postcode, will_join_others, will_share_others, spare_seats, times, get_pos_with_api=get_pos_with_api)
+        new_pupil = await pupil_classes.create_Pupil(idx, tools.get_random_name(), postcode, will_join_others, will_share_others, spare_seats, times, get_pos_with_api=get_pos_with_api)
         return new_pupil
     except IndexError:
         print(f"\tFailed for pupil #{idx}")
