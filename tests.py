@@ -2,6 +2,7 @@ import pupil_classes
 import original_dataset_handler
 import pupil_group_calculator
 
+
 def try_distance():
     pupil1 = pupil_classes.Pupil("GU1 1SZ", False, False, 1)
     pupil2 = pupil_classes.Pupil("KT11 2AF", False, False, 1)
