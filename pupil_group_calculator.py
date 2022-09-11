@@ -27,13 +27,47 @@ class Group:
     def can_take_another_pupil(self) -> bool:
         return self.driver.spare_seats+1 > len(self.people)
 
-    def add_pupil(self, new_pupil: pupil_classes.Pupil):
+    def append_pupil(self, new_pupil: pupil_classes.Pupil):
         if new_pupil in self.people:
             raise ArgumentError("Cannot add pupil to group as already in group")
         if not self.can_take_another_pupil():
             raise ArgumentError(f"Driver #{self.driver.id} cannot fit another pupil in car, already has [{' ,'.join(f'#{p.id}' for p in self.people[1:])}] and only has {self.driver.spare_seats} spare seats")
         self.route_length += self.query_route_extension_if_append_new_pupil(new_pupil)
         self.people.append(new_pupil)
+
+    def insert_pupil(self, new_pupil: pupil_classes.Pupil, index: int):
+        if new_pupil in self.people:
+            raise ArgumentError("Cannot add pupil to group as already in group")
+        if not self.can_take_another_pupil():
+            raise ArgumentError(f"Driver #{self.driver.id} cannot fit another pupil in car, already has [{' ,'.join(f'#{p.id}' for p in self.people[1:])}] and only has {self.driver.spare_seats} spare seats")
+        if index > len(self.people):
+            raise ArgumentError("Cannot insert beyond end of people list")
+        if index == len(self.people):
+            self.append_pupil(new_pupil)
+            return
+        if index == 0:
+            assert(new_pupil.will_share_others and self.driver.will_join_others)
+            self.route_length += self.query_route_extension_if_insert_new_pupil(new_pupil, 0)
+            self.people.insert(0, new_pupil)
+            return
+        assert(new_pupil.will_join_others)
+        self.route_length += self.query_route_extension_if_insert_new_pupil(new_pupil, index)
+        self.people.insert(index, new_pupil)
+
+    def remove_pupil(self, index: int):
+        assert(index != 0) # NYI
+        if index >= len(self.people):
+            raise ArgumentError("Cannot delete beyond end of people list")
+        if index == len(self.people) - 1:
+            self.route_length -= self.people[-1].distance_to_school
+            self.route_length += self.people[-2].distance_to_school
+            self.route_length -= self.people[-2].get_distance_to_other_pupil(self.people[-1])
+            self.people.remove(self.people[-1])
+            return
+        self.route_length += self.people[index-1].get_distance_to_other_pupil(self.people[index+1])
+        self.route_length -= self.people[index-1].get_distance_to_other_pupil(self.people[index])
+        self.route_length -= self.people[index].get_distance_to_other_pupil(self.people[index+1])
+        self.people.remove(self.people[index])
 
     def query_route_extension_if_append_new_pupil(self, new_pupil: pupil_classes.Pupil) -> float:
         return new_pupil.distance_to_school - self.last_person.distance_to_school + self.last_person.get_distance_to_other_pupil(new_pupil)
@@ -77,15 +111,15 @@ def create_random_groups(pupils: list[pupil_classes.Pupil], verbosity:int=2) -> 
     for pupil in pupils_freeloading:
         # find the group where it would add the least number of miles
         # TODO: make a new group if no groups exist which can take a new passenger (very rare occurence)
-        best_group = min([group for group in groups if group.can_take_another_pupil()], key=lambda group: group.query_route_extension_if_add_new_pupil(pupil))
-        best_group.add_pupil(pupil)
+        best_group = min([group for group in groups if group.can_take_another_pupil()], key=lambda group: group.query_route_extension_if_append_new_pupil(pupil))
+        best_group.append_pupil(pupil)
     
     for pupil in pupils_willing_to_share_and_join:
         # see which group is best to add them to
         best_dist = math.inf
         best_group = None
         for group in [group for group in groups if group.can_take_another_pupil()]:
-            dist = group.query_route_extension_if_add_new_pupil(pupil)
+            dist = group.query_route_extension_if_append_new_pupil(pupil)
             if dist < best_dist:
                 dist = best_dist
                 best_group = group
@@ -93,7 +127,7 @@ def create_random_groups(pupils: list[pupil_classes.Pupil], verbosity:int=2) -> 
             # make a new group with this person
             groups.append(Group(pupil))
         else:
-            best_group.add_pupil(pupil)
+            best_group.append_pupil(pupil)
 
     for group in groups:
         if verbosity >= 2: print(f"\tGroup with driver #{group.driver.id}: [{', '.join(f'#{str(p.id)}' for p in group.people)}] (max {group.driver.spare_seats}) ({'wants' if group.driver.will_share_others else 'doesnt want'} to share) ({'wants' if group.driver.will_join_others else 'doesnt want'} to join)")
@@ -138,18 +172,21 @@ def group_improvement_attempt_reorder(groups: list[Group], verbose=False) -> tup
 
     return groups, made_an_improvement
 
-def group_improvement_attempt_remove_into_other_group(groups: list[Group], iterations:int = 100, verbose=False) -> tuple[list[Group], bool]:
+def group_improvement_attempt_remove_into_other_group(groups: list[Group], iterations:int = 1000, verbose=False) -> tuple[list[Group], bool]:
     made_improvement = False
-    for iteration in iterations:
+    for iteration in range(iterations):
         # pick a random group
-        groups_with_passengers = [g for g in groups if len(g) > 1]
+        groups_with_passengers = [g for g in groups if len(g.people) > 1]
         if len(groups_with_passengers) == 0:
+            print(f"returning early on iteration {iteration}!")
             return groups, made_improvement
         main_group: Group = random.choice(groups_with_passengers)
         original_route_length = main_group.route_length
         really_best_other_group = None
         really_best_other_group_position = None
         really_best_new_route_length = original_route_length
+        really_best_main_group_person = None
+        really_best_main_group_index = None
         for i, person in enumerate(main_group.people):
             if i == 0: continue # dont remove driver
             new_route_length = original_route_length
@@ -181,5 +218,14 @@ def group_improvement_attempt_remove_into_other_group(groups: list[Group], itera
                 really_best_other_group = best_other_group
                 really_best_other_group_position = best_other_group_position
                 really_best_new_route_length = new_route_length + best_route_extension
+                really_best_main_group_index = i
+                really_best_main_group_person = person
 
-                # WIP
+        if really_best_other_group is not None:
+            made_improvement = True
+            print(f"OMG!: changed from {original_route_length} to {really_best_new_route_length}")
+            really_best_other_group.insert_pupil(really_best_main_group_person, really_best_other_group_position)
+            main_group.remove_pupil(really_best_main_group_index)
+
+
+    return groups, made_improvement

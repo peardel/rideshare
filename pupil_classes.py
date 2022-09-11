@@ -46,6 +46,9 @@ class Pupil:
                 self.distance_to_school: float = tools.lat_lon_euclidean_dist(self.latitude, self.longitude, SCHOOL_COORDINATES[0], SCHOOL_COORDINATES[1])
 
     def get_distance_to_other_pupil(self, pupil: "Pupil") -> float:
+        if abs(self.latitude) < 1 and abs(self.longitude) < 1:
+            print(f"!!!!!{self.postcode}")
+            raise Exception
         return tools.lat_lon_euclidean_dist(self.latitude, self.longitude, pupil.latitude, pupil.longitude)
 
     def __repr__(self) -> str:
