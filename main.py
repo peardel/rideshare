@@ -1,7 +1,7 @@
 import pandas
 import openrouteservice
 import original_dataset_handler
-from pupil import Pupil
+from pupil_classes import Pupil
 
 df = pandas.read_excel("OriginalDataset.xlsx")
 
