@@ -41,5 +41,5 @@ async def harvest_pupil_data_from_excel(filename: str="OriginalDataset.xlsx", ve
             if pupil.will_share_others:
                 pupils_willing_to_share.append(pupil)
     
-    print(f"Finished harvesting pupil data for {len(pupils)} pupils, {len(pupils_willing_to_share)} willing to share")
+    if verbose: print(f"Finished harvesting pupil data for {len(pupils)} pupils, {len(pupils_willing_to_share)} willing to share")
     return pupils, pupils_willing_to_share

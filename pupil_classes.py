@@ -1,5 +1,3 @@
-import requests
-import json
 import tools
 import openrouteservice
 import aiohttp

@@ -24,6 +24,9 @@ class Group:
     def last_person(self) -> pupil_classes.Pupil:
         return self.people[-1]
 
+    def get_total_length_if_people_drive_individually(self) -> float:
+        return sum(p.distance_to_school for p in self.people)
+
     def can_take_another_pupil(self) -> bool:
         return self.driver.spare_seats+1 > len(self.people)
 
@@ -86,9 +89,10 @@ def seperate_pupils_by_times(pupils: list[pupil_classes.Pupil], day: int, arriva
     pupil_sections: dict[int, list[pupil_classes.Pupil]] = {pupil_time: [] for pupil_time in pupils_times}
     for i, pupil in enumerate(pupils):
         pupil_sections[pupils_times[i]].append(pupil)
-    print(f"Found possible times of [{', '.join(tools.int_to_time_string(t_s) for t_s in pupil_sections.keys())}]")
-    for time, pupils_in_section in pupil_sections.items():
-        print(f"\t{tools.int_to_time_string(time)}: [{', '.join(f'#{str(pupil.id).zfill(2)}' for pupil in pupils_in_section)}]")
+    if verbose: 
+        print(f"Found possible times of [{', '.join(tools.int_to_time_string(t_s) for t_s in pupil_sections.keys())}]")
+        for time, pupils_in_section in pupil_sections.items():
+            print(f"\t{tools.int_to_time_string(time)}: [{', '.join(f'#{str(pupil.id).zfill(2)}' for pupil in pupils_in_section)}]")
     return pupil_sections
 
 def create_random_groups(pupils: list[pupil_classes.Pupil], verbosity:int=2) -> list[list[pupil_classes.Pupil]]:
@@ -107,10 +111,14 @@ def create_random_groups(pupils: list[pupil_classes.Pupil], verbosity:int=2) -> 
     for pupil in pupils_willing_to_share_only:
         groups.append(Group(driver=pupil))
 
-    # prioritise "using up" the people who wont share   
+    # prioritise "using up" the people who wont share
+    annoying_freeloaders = []
     for pupil in pupils_freeloading:
         # find the group where it would add the least number of miles
         # TODO: make a new group if no groups exist which can take a new passenger (very rare occurence)
+        if len([group for group in groups if group.can_take_another_pupil()]) == 0:
+            annoying_freeloaders.append(pupil)
+            continue
         best_group = min([group for group in groups if group.can_take_another_pupil()], key=lambda group: group.query_route_extension_if_append_new_pupil(pupil))
         best_group.append_pupil(pupil)
     
@@ -126,6 +134,21 @@ def create_random_groups(pupils: list[pupil_classes.Pupil], verbosity:int=2) -> 
         if best_group is None or best_dist > pupil.distance_to_school:
             # make a new group with this person
             groups.append(Group(pupil))
+        else:
+            best_group.append_pupil(pupil)
+
+    for pupil in annoying_freeloaders:
+        best_dist = math.inf
+        best_group = None
+        for group in [group for group in groups if group.can_take_another_pupil()]:
+            dist = group.query_route_extension_if_append_new_pupil(pupil)
+            if dist < best_dist:
+                dist = best_dist
+                best_group = group
+        if best_group is None or best_dist > pupil.distance_to_school:
+            # make a new group with this person
+            groups.append(Group(pupil))
+            pupil.spare_seats = 0
         else:
             best_group.append_pupil(pupil)
 
@@ -166,7 +189,7 @@ def group_improvement_attempt_reorder(groups: list[Group], verbose=False) -> tup
             # we have found a better ordering of everyone
             made_an_improvement = True
             if verbose: print(f"Group went from [{', '.join(f'#{p.id}' for p in group.people)}] with length {group.route_length}, to: ", end="")
-            group.people = new_perm
+            group.people = list(new_perm)
             group.route_length = best_new_route_length
             if verbose: print(f"[{', '.join(f'#{p.id}' for p in group.people)}] with length {group.route_length}")
 
@@ -178,7 +201,7 @@ def group_improvement_attempt_remove_into_other_group(groups: list[Group], itera
         # pick a random group
         groups_with_passengers = [g for g in groups if len(g.people) > 1]
         if len(groups_with_passengers) == 0:
-            print(f"returning early on iteration {iteration}!")
+            if verbose: print(f"returning early on iteration {iteration}!")
             return groups, made_improvement
         main_group: Group = random.choice(groups_with_passengers)
         original_route_length = main_group.route_length
@@ -213,7 +236,14 @@ def group_improvement_attempt_remove_into_other_group(groups: list[Group], itera
                         best_other_group = other_group
                         best_other_group_position = other_group_index
                         best_route_extension = route_extension
-            
+
+            # test if they would be better in a new group!
+            rotue_extension_if_make_new_group = person.distance_to_school
+            if rotue_extension_if_make_new_group < best_route_extension:
+                best_route_extension = rotue_extension_if_make_new_group
+                best_other_group_position = -1
+                best_other_group = 1
+
             if new_route_length + best_route_extension < really_best_new_route_length: # found new better configuration!
                 really_best_other_group = best_other_group
                 really_best_other_group_position = best_other_group_position
@@ -223,9 +253,21 @@ def group_improvement_attempt_remove_into_other_group(groups: list[Group], itera
 
         if really_best_other_group is not None:
             made_improvement = True
-            print(f"OMG!: changed from {original_route_length} to {really_best_new_route_length}")
-            really_best_other_group.insert_pupil(really_best_main_group_person, really_best_other_group_position)
+            if verbose: print(f"OMG!: changed from {original_route_length} to {really_best_new_route_length}")
+            if (best_other_group_position == -1):
+                # make them a new group
+                groups.append(Group(really_best_main_group_person))
+                if not really_best_main_group_person.will_share_others:
+                    groups[-1].driver.spare_seats = 0
+            else:
+                really_best_other_group.insert_pupil(really_best_main_group_person, really_best_other_group_position)
             main_group.remove_pupil(really_best_main_group_index)
 
 
     return groups, made_improvement
+
+def get_total_length_of_groups(groups: list[Group]) -> float:
+    return sum(g.route_length for g in groups)
+
+def get_total_original_length_of_groups(groups: list[Group]) -> float:
+    return sum(g.get_total_length_if_people_drive_individually() for g in groups)

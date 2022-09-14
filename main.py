@@ -2,23 +2,28 @@ import pandas
 import openrouteservice
 import original_dataset_handler
 import asyncio
-from pupil_classes import create_Pupil, Pupil
-
-df = pandas.read_excel("OriginalDataset.xlsx")
-
-coords = lambda A,B: ((A.longitude,A.latitude),(B.longitude,B.latitude))
-
-MAX_DISTANCE_TRAVELLABLE = 0.1
-client = openrouteservice.Client(key="5b3ce3597851110001cf6248b0c4037940f3452a988853816da080e9") # distance calcs should only be used to go to school, not to compare with other students
-
-def get_distance_to_school(pupil: Pupil, SCHOOL: Pupil):
-    routes = client.directions(coords(pupil, SCHOOL))
-    return routes["routes"][0]["summary"]["distance"]
+from pupil_classes import Pupil
+import pupil_group_calculator
 
 async def main():
-    SCHOOL = await create_Pupil(-1, "SCHOOL", "GU1 3BB", False, False, 0, (0,0))
-    pupils, pupils_willing_to_drive = await original_dataset_handler.harvest_pupil_data_from_excel()
-    for pupil in pupils:
-        print(pupil)
+    all_pupils, pupils_willing_to_share = await original_dataset_handler.harvest_pupil_data_from_excel(get_pos_with_api=True, verbose=False)
+    print("Finished harvesting data")
+    
+    for day, day_string in enumerate(("Monday", "Tuesday", "Wdnsday", "Thusday", "Friday")):
+        for arrival_or_departure in (pupil_group_calculator.ArrivalOrDeparture.ARRIVAL, pupil_group_calculator.ArrivalOrDeparture.DEPARTURE):
+            times_dict = pupil_group_calculator.seperate_pupils_by_times(all_pupils, day, arrival_or_departure, verbose=False)
+            groups_for_each_time = []
+            for time, pupils in times_dict.items():
+                groups = pupil_group_calculator.create_random_groups(pupils, verbosity=0)
+                groups_for_each_time.append(groups)
+            
+            # do the calculations
+            for groups in groups_for_each_time:
+                for i in range(5):
+                    groups, improved = pupil_group_calculator.group_improvement_attempt_reorder(groups, False)
+                    groups, improved = pupil_group_calculator.group_improvement_attempt_remove_into_other_group(groups, 1000, False)
+            total_original_length = sum(pupil_group_calculator.get_total_original_length_of_groups(groups) for groups in groups_for_each_time)
+            total_new_length = sum(pupil_group_calculator.get_total_length_of_groups(groups) for groups in groups_for_each_time)
+            print(f"For {day_string} {['AM', 'PM'][arrival_or_departure]},\tOriginal Route Lengths: {total_original_length:.3f}km, New: {total_new_length:.3f}km. Saved {total_original_length-total_new_length:.3f}km and {0.275*(total_original_length-total_new_length):.2f}kg of CO2")
 
 asyncio.run(main())
