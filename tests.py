@@ -12,7 +12,7 @@ def try_distance():
     print(pupil1.get_distance(pupil2))
 
 async def try_pupil_time_seperation():
-    pupils, pupils_willing_to_share = await original_dataset_handler.harvest_pupil_data_from_excel(get_pos_with_api=True, verbose=False)
+    pupils = await original_dataset_handler.harvest_pupil_data_from_excel(get_pos_with_api=True, verbose=False)
     times_dict = pupil_group_calculator.seperate_pupils_by_times(pupils, 1, pupil_group_calculator.ArrivalOrDeparture.DEPARTURE)
     groups_of_groups = []
     for time, pupils in times_dict.items():
