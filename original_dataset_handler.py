@@ -32,14 +32,10 @@ async def harvest_pupil_data_from_excel(filename: str="OriginalDataset.xlsx", ve
     
     preprocessed_pupils = await asyncio.gather(*coroutines)
     pupils = []
-    pupils_willing_to_share = []
 
     for pupil in preprocessed_pupils:
         if pupil is not None:
             pupils.append(pupil)
-
-            if pupil.will_share_others:
-                pupils_willing_to_share.append(pupil)
     
     if verbose: print(f"Finished harvesting pupil data for {len(pupils)} pupils, {len(pupils_willing_to_share)} willing to share")
-    return pupils, pupils_willing_to_share
+    return pupils
