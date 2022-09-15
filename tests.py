@@ -27,18 +27,19 @@ async def try_pupil_time_seperation():
 
 def serialize_new_pupils():
     postcodes = [postcode for postcode in open("catchment.txt","r").read().split(",")]
-    wants = ["YES", "NO"]
+    wants = ["NO", "YES"]
     to_be_lifted, to_share = [],[]
     free_car_seats = []
     thousand_existent_postcodes = []
-    arrivals,leaves = [[] for i in range(5)], [[] for i in range(5)]
+    arrivals,leaves = [list() for i in range(5)], [list() for i in range(5)]
     arrival_times = ["07:30","07:45","08:00","08:15","08:30"]
     leaving_times = ["16:00","16:20","17:00","17:30","18:00"]
 
     for i in range(1000):
         choice = random.randint(0,len(postcodes))
-        to_be_lifted.append(random.choice(wants))
-        to_share.append(random.choice(wants))
+        lifting_sharing_random = random.choice([0b11, 0b10, 0b01])
+        to_be_lifted.append(wants[(lifting_sharing_random & 0b10) >> 1])
+        to_share.append(wants[lifting_sharing_random & 0b01])
         free_car_seats.append(random.randint(1,3))
 
         for i in range(5):

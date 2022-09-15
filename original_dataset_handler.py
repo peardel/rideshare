@@ -35,7 +35,8 @@ async def harvest_pupil_data_from_excel(filename: str="OriginalDataset.xlsx", ve
 
     for pupil in preprocessed_pupils:
         if pupil is not None:
+            assert(pupil.will_join_others or pupil.will_share_others)
             pupils.append(pupil)
     
-    if verbose: print(f"Finished harvesting pupil data for {len(pupils)} pupils, {len(pupils_willing_to_share)} willing to share")
+    if verbose: print(f"Finished harvesting pupil data for {len(pupils)} pupils")
     return pupils
