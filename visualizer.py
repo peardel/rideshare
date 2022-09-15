@@ -133,12 +133,16 @@ async def visualize(results: list[dict]):
             color = (255,255,255),
             rect = pygame.Rect(button_offset,size_window - button_offset - button_size,button_size, button_size)
         )
+        left = font.render("<", True, (0,0,0))
+        screen.blit(left,(int(button_offset + (9/20)*button_size), int(size_window - button_offset - (25/40)*button_size))) # what are these numbers
 
         pygame.draw.rect(
             surface = screen,
             color = (255,255,255),
             rect = pygame.Rect(size_window+tooltip_extra_size-button_offset - button_size, size_window - button_offset - button_size, button_size, button_size) # pep8
         )
+        right = font.render("<", True, (0,0,0))
+        screen.blit(right,(int(size_window+tooltip_extra_size-button_offset-(11/20)*(button_size)),int(size_window-button_offset-(25/40)*button_size)))
 
     objects = [objects[0]] # need to go together otherwise end up using global keyword 
     current_selection, grouped_points, title = update_selection(True, current_selection)
