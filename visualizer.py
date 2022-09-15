@@ -14,6 +14,7 @@ tooltip_extra_size = 300
 point_radius = 3
 font_size = 20
 button_offset = 25
+button_size = 50
 
 day = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 time = ["Morning", "Afternoon"]
@@ -130,13 +131,13 @@ async def visualize(results: list[dict]):
         pygame.draw.rect(
             surface = screen,
             color = (255,255,255),
-            rect = pygame.Rect(button_offset,size_window - button_offset,50,50)
+            rect = pygame.Rect(button_offset,size_window - button_offset - button_size,button_size, button_size)
         )
 
         pygame.draw.rect(
             surface = screen,
             color = (255,255,255),
-            rect = pygame.Rect(size_window+tooltip_extra_size-button_offset, size_window - button_offset, 50, 50) # pep8
+            rect = pygame.Rect(size_window+tooltip_extra_size-button_offset - button_size, size_window - button_offset - button_size, button_size, button_size) # pep8
         )
 
     objects = [objects[0]] # need to go together otherwise end up using global keyword 
