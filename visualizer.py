@@ -1,3 +1,4 @@
+from json import tool
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide" # just for nice stdout
 
@@ -12,6 +13,7 @@ size_window = 800
 tooltip_extra_size = 300
 point_radius = 3
 font_size = 20
+button_offset = 25
 
 day = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 time = ["Morning", "Afternoon"]
@@ -50,6 +52,9 @@ async def visualize(results: list[dict]):
     )
     objects.append([school])
 
+    current_selection = 9
+    title = None
+
     def draw_obj(obj: list[Point]):
         for i,point in enumerate(obj): # draw lines in a bit
             pygame.draw.circle(
@@ -59,27 +64,40 @@ async def visualize(results: list[dict]):
                 radius = point_radius
             )
             
-            if i == len(obj)-1:
-                pygame.draw.line(
-                    surface = screen,
-                    color = point.pygame_properties["color"],
-                    start_pos = (point.x,point.y),
-                    end_pos = (school.x,school.y)
-                )
+            if current_selection % 2 == 0: # ugly
+                if i == len(obj)-1:
+                    pygame.draw.line(
+                        surface = screen,
+                        color = point.pygame_properties["color"],
+                        start_pos = (point.x,point.y),
+                        end_pos = (school.x,school.y)
+                    )
+                else:
+                    pygame.draw.line(
+                        surface = screen,
+                        color = point.pygame_properties["color"],
+                        start_pos = (point.x,point.y),
+                        end_pos = (obj[i+1].x,obj[i+1].y)
+                    )
             else:
-                pygame.draw.line(
-                    surface = screen,
-                    color = point.pygame_properties["color"],
-                    start_pos = (point.x,point.y),
-                    end_pos = (obj[i+1].x,obj[i+1].y)
-                )
-
-    current_selection = 9
-    title = None
+                if i == 0:
+                    pygame.draw.line(
+                        surface = screen,
+                        color = point.pygame_properties["color"],
+                        start_pos = (point.x,point.y),
+                        end_pos = (school.x,school.y)
+                    )
+                else:
+                    pygame.draw.line(
+                        surface = screen,
+                        color = point.pygame_properties["color"],
+                        start_pos = (point.x,point.y),
+                        end_pos = (obj[i-1].x,obj[i-1].y)
+                    )
 
     def update_selection(right: bool, current_choice: int):
         updated_choice = (current_choice + (1 if right else -1)) % 10
-        title = font.render(f"{day[updated_choice // 2]} {time[updated_choice % 2]}")
+        title = font.render(f"{day[updated_choice // 2]} {time[updated_choice % 2]}", True, (255,255,255))
 
         selection = results[updated_choice]
         groups = selection["groups"]
@@ -107,7 +125,19 @@ async def visualize(results: list[dict]):
                     group_points.append(personal_point)
                 all_grouped_points.append(group_points)
         return updated_choice,all_grouped_points,title
-                
+    
+    def draw_buttons():
+        pygame.draw.rect(
+            surface = screen,
+            color = (255,255,255),
+            rect = pygame.Rect(button_offset,size_window - button_offset,50,50)
+        )
+
+        pygame.draw.rect(
+            surface = screen,
+            color = (255,255,255),
+            rect = pygame.Rect(size_window+tooltip_extra_size-button_offset, size_window - button_offset, 50, 50) # pep8
+        )
 
     objects = [objects[0]] # need to go together otherwise end up using global keyword 
     current_selection, grouped_points, title = update_selection(True, current_selection)
@@ -157,6 +187,12 @@ Driver: {group_associated[0].pupil.name}"""
         for obj in objects[::-1]: # reversed so school point is on top
             draw_obj(obj)
 
+        # title
+        screen.blit(title, ((size_window+200)/2, 50))
+
+        # buttons
+        draw_buttons()
+        
         pygame.display.update()
     
     pygame.quit()
