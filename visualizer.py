@@ -42,7 +42,7 @@ async def visualize(results: list[dict]):
     running = True
     objects = []
     
-    SCHOOL_PUPIL = await pupil_classes.create_Pupil(-1, "School", "GU1 3BB", False, False, 0, [])
+    SCHOOL_PUPIL = await pupil_classes.create_Pupil(-1, "School", "GU1 3BB", False, False, 0, [(0,0)] * 5)
     school = Point(
         (size_window / 2, size_window / 2),
         "School",
@@ -128,7 +128,7 @@ async def visualize(results: list[dict]):
         return updated_choice,all_grouped_points,title
     
     def draw_buttons():
-        pygame.draw.rect(
+        left_btn = pygame.draw.rect(
             surface = screen,
             color = (255,255,255),
             rect = pygame.Rect(button_offset,size_window - button_offset - button_size,button_size, button_size)
@@ -136,13 +136,15 @@ async def visualize(results: list[dict]):
         left = font.render("<", True, (0,0,0))
         screen.blit(left,(int(button_offset + (9/20)*button_size), int(size_window - button_offset - (25/40)*button_size))) # what are these numbers
 
-        pygame.draw.rect(
+        right_btn = pygame.draw.rect(
             surface = screen,
             color = (255,255,255),
             rect = pygame.Rect(size_window+tooltip_extra_size-button_offset - button_size, size_window - button_offset - button_size, button_size, button_size) # pep8
         )
-        right = font.render("<", True, (0,0,0))
+        right = font.render(">", True, (0,0,0))
         screen.blit(right,(int(size_window+tooltip_extra_size-button_offset-(11/20)*(button_size)),int(size_window-button_offset-(25/40)*button_size)))
+
+        return left_btn,right_btn
 
     objects = [objects[0]] # need to go together otherwise end up using global keyword 
     current_selection, grouped_points, title = update_selection(True, current_selection)
@@ -151,9 +153,26 @@ async def visualize(results: list[dict]):
     while running:
         screen.fill((0,0,0))
 
+        # title
+        screen.blit(title, ((size_window+200)/2, 50))
+
+        # buttons
+        left_btn,right_btn = draw_buttons()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                pos = pygame.mouse.get_pos()
+
+                if left_btn.collidepoint(pos):
+                    objects = [objects[0]] # need to go together otherwise end up using global keyword 
+                    current_selection, grouped_points, title = update_selection(False, current_selection)
+                    objects = [*objects, *grouped_points]
+                elif right_btn.collidepoint(pos):
+                    objects = [objects[0]] # need to go together otherwise end up using global keyword 
+                    current_selection, grouped_points, title = update_selection(True, current_selection)
+                    objects = [*objects, *grouped_points]
 
         closest_point = None
         closest_length = 800
@@ -174,11 +193,14 @@ async def visualize(results: list[dict]):
             pupil = closest_point.pupil
             pupil_group = copy.copy(group_associated)
             pupil_group.remove(closest_point)
+            school_time = pupil.times[current_selection // 2][current_selection % 2]
+            formatted_time = f"{'' if len(str(school_time // 60)) == 2 else '0'}{school_time // 60}:{'' if len(str(school_time % 60)) == 2 else '0'}{school_time % 60}"
             details = f"""{pupil.name}
 {pupil.postcode}
 Wants to share: {("No", "Yes")[int(pupil.will_share_others)]}
 Wants to freeload: {("No", "Yes")[int(pupil.will_join_others)]}
 Spare seats: {pupil.spare_seats}
+{["Arrival", "Departure"][current_selection % 2]} time: {formatted_time}
 Location: {pupil.latitude}, {pupil.longitude}
 Riding with: {"Nobody" if len(pupil_group) == 0 else ", ".join([point.pupil.name for point in pupil_group])}
 Driver: {group_associated[0].pupil.name}"""
@@ -191,12 +213,6 @@ Driver: {group_associated[0].pupil.name}"""
 
         for obj in objects[::-1]: # reversed so school point is on top
             draw_obj(obj)
-
-        # title
-        screen.blit(title, ((size_window+200)/2, 50))
-
-        # buttons
-        draw_buttons()
         
         pygame.display.update()
     

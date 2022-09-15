@@ -21,7 +21,7 @@ async def get_pupil_from_item(item, get_pos_with_api, verbose):
 async def harvest_pupil_data_from_excel(filename: str="OriginalDataset.xlsx", verbose: bool=True, get_pos_with_api: bool=True) -> tuple[list[pupil_classes.Pupil]]:
     if verbose: print(f"Harvesting pupil data from {filename}")
     full_filename = os.path.join(os.path.dirname(__file__), filename)
-    data: pd.DataFrame = pd.read_excel(io=full_filename, header=0, names=None, index_col=None, usecols="A:N", true_values="YES", false_values="NO", nrows=101)
+    data: pd.DataFrame = pd.read_excel(io=full_filename, header=0, names=None, index_col=None, usecols="A:N", true_values="YES", false_values="NO", nrows=1001)
 
     coroutines = []
 

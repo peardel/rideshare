@@ -8,7 +8,7 @@ import visualizer
 
 async def main():
     print("Obtaining pupil data...")
-    all_pupils = await original_dataset_handler.harvest_pupil_data_from_excel(filename="NewDataset.xlsx", get_pos_with_api=True, verbose=False)
+    all_pupils = await original_dataset_handler.harvest_pupil_data_from_excel(get_pos_with_api=True, verbose=False)
     print("Finished harvesting data.")
 
     results = []
@@ -42,7 +42,7 @@ async def main():
 
             results.append(result)
     
-    print("Opening PyGame window to visualise results...")
+    print("Opening PyGame window to visualise results... (hover over each point to view details)")
 
     await visualizer.visualize(results)
 
