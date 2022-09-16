@@ -6,11 +6,12 @@ Generates ride-shares based on an excel input, and visualizes them on a map.
 - Python3
 - pip
 
-### Installation
+### Installation and Running
 ```
 git clone https://github.com/peardel/rideshare.git
 pip install -r requirements.txt
 ```
+Then run `main.py`. This may take some time to download position data for postcodes due to rate throttling, however it will finish in ~20s.
 
 ## Excel Format
 
