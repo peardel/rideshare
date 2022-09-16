@@ -2,7 +2,6 @@ import pandas as pd
 import os
 import tools
 import asyncio
-import threading
 
 import pupil_classes
 

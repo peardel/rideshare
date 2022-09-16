@@ -1,12 +1,25 @@
 # Rideshare
 
-Wow oh boy i looooooooooooooooove Rideshare
+Generates ride-shares based on an excel input, and visualizes them on a map.
 
-## Data
+### Requirements:
+- Python3
+- pip
+
+### Installation
+```
+git clone https://github.com/peardel/rideshare.git
+pip install -r requirements.txt
+```
+
+## Excel Format
 
 - Postcode
-- Want to get a Lift
-- Want to offer a Lift
-- \# Free seats
+- Want to get a lift (YES/NO)
+- Want to offer a lift (YES/NO)
+- Free seats
 - Times of arrival and departure Mon-Fri
-- 100 Different people
+
+### Notes
+- New datasets can be generated in tests.py
+- The number of rows to be read must be set in line 23 of original_dataset_handler.py, where it is 100 by default (101 including the header)
