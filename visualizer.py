@@ -174,12 +174,20 @@ async def visualize(results: list[dict]):
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 pos = pygame.mouse.get_pos()
-
                 if left_btn.collidepoint(pos):
-                    objects = [objects[0]] # need to go together otherwise end up using global keyword 
+                    objects = [objects[0]] # need to go together otherwise end up using global keyword
                     current_selection, grouped_points, title = update_selection(False, current_selection)
                     objects = [*objects, *grouped_points]
                 elif right_btn.collidepoint(pos):
+                    objects = [objects[0]] # need to go together otherwise end up using global keyword 
+                    current_selection, grouped_points, title = update_selection(True, current_selection)
+                    objects = [*objects, *grouped_points]
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    objects = [objects[0]] # need to go together otherwise end up using global keyword
+                    current_selection, grouped_points, title = update_selection(False, current_selection)
+                    objects = [*objects, *grouped_points]
+                elif event.key == pygame.K_RIGHT:
                     objects = [objects[0]] # need to go together otherwise end up using global keyword 
                     current_selection, grouped_points, title = update_selection(True, current_selection)
                     objects = [*objects, *grouped_points]
