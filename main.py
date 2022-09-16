@@ -1,8 +1,5 @@
-import pandas
-import openrouteservice
 import original_dataset_handler
 import asyncio
-from pupil_classes import Pupil
 import pupil_group_calculator
 import visualizer
 

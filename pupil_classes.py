@@ -1,8 +1,5 @@
 import tools
-import openrouteservice
 import aiohttp
-
-client = openrouteservice.Client(key="5b3ce3597851110001cf6248b0c4037940f3452a988853816da080e9")
 
 SCHOOL_COORDINATES = (51.23738,-0.56944)
 
