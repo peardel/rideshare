@@ -57,6 +57,8 @@ async def visualize(results: list[dict]):
     title = None
 
     def draw_obj(obj: list[Point], do_bold=False, closest_point=None, closest_length=None):
+        if current_selection % 2 == 1:
+            obj = obj[::-1]
 
         for i,point in enumerate(obj): # draw lines in a bit
             bold = False
