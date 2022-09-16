@@ -239,4 +239,4 @@ Driver: {group_associated[0].pupil.name}"""
     pygame.quit()
         
 if __name__ == "__main__":
-    asynci
+    asyncio.run(visualize([]))

@@ -48,9 +48,3 @@ class Pupil:
 
     def __repr__(self) -> str:
         return f"{self.name}:\t {self.postcode},\t ({self.latitude}, {self.longitude}), WJ: {self.will_join_others}, WS: {self.will_share_others}, Spare Seats: {self.spare_seats}, "
-
-coords = lambda A,B: ((A.longitude,A.latitude),(B.longitude,B.latitude))
-
-def get_distance(pupil1: Pupil, pupil2: Pupil):
-    routes = client.directions(coords(pupil1, pupil2))
-    return routes["routes"][0]["summary"]["distance"]
