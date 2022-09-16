@@ -9,7 +9,7 @@ async def main():
     print("Finished harvesting data.")
 
     results = []
-    
+
     for day, day_string in enumerate(("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")):
         for arrival_or_departure in (pupil_group_calculator.ArrivalOrDeparture.ARRIVAL, pupil_group_calculator.ArrivalOrDeparture.DEPARTURE):
             times_dict = pupil_group_calculator.seperate_pupils_by_times(all_pupils, day, arrival_or_departure, verbose=False)
@@ -39,7 +39,7 @@ async def main():
 
             results.append(result)
     
-    print("Opening PyGame window to visualise results... (hover over each point to view details)")
+    print("Opening PyGame window to visualise results... (hover over each point to view details, use buttons or arrow keys to scroll)")
 
     await visualizer.visualize(results)
 

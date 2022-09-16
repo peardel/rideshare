@@ -56,6 +56,11 @@ async def visualize(results: list[dict]):
     current_selection = 9
     title = None
 
+    def write_info():
+        text = f"Saved {results[current_selection]['original_length']-results[current_selection]['total_new_length']:.3f}km and {0.275*(results[current_selection]['original_length']-results[current_selection]['total_new_length']):.2f}kg of CO2"
+        img = font.render(text,True,(255,255,255))
+        screen.blit(img,(20,20))
+
     def draw_obj(obj: list[Point], do_bold=False, closest_point=None, closest_length=None):
         if current_selection % 2 == 1:
             obj = obj[::-1]
@@ -233,6 +238,8 @@ Driver: {group_associated[0].pupil.name}"""
 
         for j, obj in enumerate(objects[::-1]): # reversed so school point is on top
             draw_obj(obj, True, closest_point, closest_length)
+
+        write_info()
 
         pygame.display.update()
     
