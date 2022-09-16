@@ -56,13 +56,19 @@ async def visualize(results: list[dict]):
     current_selection = 9
     title = None
 
-    def draw_obj(obj: list[Point]):
+    def draw_obj(obj: list[Point], do_bold=False, closest_point=None, closest_length=None):
+
         for i,point in enumerate(obj): # draw lines in a bit
+            bold = False
+            if do_bold and closest_point is not None and closest_length <= point_radius+2:
+                bold = closest_point.pupil == point.pupil
+            width = [1, 4][bold]
+            point_radius_extra = [0, 3][bold]
             pygame.draw.circle(
                 surface = screen,
                 color = point.pygame_properties["color"],
                 center = (point.x,point.y),
-                radius = point_radius
+                radius = point_radius + point_radius_extra
             )
             
             if current_selection % 2 == 0: # ugly
@@ -71,14 +77,16 @@ async def visualize(results: list[dict]):
                         surface = screen,
                         color = point.pygame_properties["color"],
                         start_pos = (point.x,point.y),
-                        end_pos = (school.x,school.y)
+                        end_pos = (school.x,school.y),
+                        width = width
                     )
                 else:
                     pygame.draw.line(
                         surface = screen,
                         color = point.pygame_properties["color"],
                         start_pos = (point.x,point.y),
-                        end_pos = (obj[i+1].x,obj[i+1].y)
+                        end_pos = (obj[i+1].x,obj[i+1].y),
+                        width = width
                     )
             else:
                 if i == 0:
@@ -86,14 +94,16 @@ async def visualize(results: list[dict]):
                         surface = screen,
                         color = point.pygame_properties["color"],
                         start_pos = (point.x,point.y),
-                        end_pos = (school.x,school.y)
+                        end_pos = (school.x,school.y),
+                        width = width
                     )
                 else:
                     pygame.draw.line(
                         surface = screen,
                         color = point.pygame_properties["color"],
                         start_pos = (point.x,point.y),
-                        end_pos = (obj[i-1].x,obj[i-1].y)
+                        end_pos = (obj[i-1].x,obj[i-1].y),
+                        width = width
                     )
 
     def update_selection(right: bool, current_choice: int):
@@ -189,7 +199,7 @@ async def visualize(results: list[dict]):
                     closest_length = math.hypot(dist_x,dist_y)
                     group_associated = group
 
-        if closest_point is not None and closest_length <= point_radius:
+        if closest_point is not None and closest_length <= point_radius+2:
             pupil = closest_point.pupil
             pupil_group = copy.copy(group_associated)
             pupil_group.remove(closest_point)
@@ -211,9 +221,9 @@ Driver: {group_associated[0].pupil.name}"""
                 screen.blit(img,(size_window-100,offset))
                 offset += font_size + 5
 
-        for obj in objects[::-1]: # reversed so school point is on top
-            draw_obj(obj)
-        
+        for j, obj in enumerate(objects[::-1]): # reversed so school point is on top
+            draw_obj(obj, True, closest_point, closest_length)
+
         pygame.display.update()
     
     pygame.quit()
