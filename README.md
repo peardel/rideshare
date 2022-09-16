@@ -2,11 +2,11 @@
 
 Generates ride-shares based on an excel input, and visualizes them on a map.
 
-### Requirements:
+## Requirements:
 - Python3
 - pip
 
-### Installation and Running
+## Installation and Running
 ```
 git clone https://github.com/peardel/rideshare.git
 pip install -r requirements.txt
@@ -21,6 +21,6 @@ Then run `main.py`. This may take some time to download position data for postco
 - Free seats
 - Times of arrival and departure Mon-Fri
 
-### Notes
+## Notes
 - New datasets can be generated in tests.py
 - The number of rows to be read must be set in line 23 of original_dataset_handler.py, where it is 100 by default (101 including the header)
