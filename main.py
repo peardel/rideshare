@@ -39,7 +39,7 @@ async def main():
 
             results.append(result)
     
-    print("Opening PyGame window to visualise results... (hover over each point to view details, use buttons or arrow keys to scroll)")
+    print("Opening PyGame window to visualise results... (hover over each point to view details, use buttons or arrow keys to scroll through session times)")
 
     await visualizer.visualize(results)
 
