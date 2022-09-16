@@ -21,7 +21,7 @@ time = ["Morning", "Afternoon"]
 
 class Point:
     def __init__(self, pos: tuple[int,int], name: str, pygame_properties: dict, pupil=None):
-        self.x = pos[0]
+        self.x = (400-pos[0])*1.59655 + 400 # ratio between lat and long
         self.y = pos[1]
         self.name = name
         self.pupil = pupil
@@ -228,7 +228,7 @@ Driver: {group_associated[0].pupil.name}"""
             offset = 50
             for line in details.split("\n"):
                 img = font.render(line, True, (255,255,255))
-                screen.blit(img,(size_window-100,offset))
+                screen.blit(img,(size_window-80,offset))
                 offset += font_size + 5
 
         for j, obj in enumerate(objects[::-1]): # reversed so school point is on top
@@ -239,4 +239,4 @@ Driver: {group_associated[0].pupil.name}"""
     pygame.quit()
         
 if __name__ == "__main__":
-    asyncio.run(visualize([]))
+    asynci
